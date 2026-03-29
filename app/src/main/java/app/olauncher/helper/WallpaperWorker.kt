@@ -1,6 +1,7 @@
 package app.olauncher.helper
 
 import android.content.Context
+import android.util.Log
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
@@ -17,8 +18,9 @@ class WallpaperWorker(appContext: Context, workerParams: WorkerParameters) : Cor
             if (isOlauncherDefault(applicationContext).not())
                 true
             else if (prefs.dailyWallpaper) {
+                Log.d("WallpaperProvider", "Running Worker.")
                 val wallType = checkWallpaperType()
-                val wallpaperUrl = getTodaysWallpaper(wallType, prefs.firstOpenTime)
+                val wallpaperUrl = getTodaysWallpaper(wallType, prefs.firstOpenTime, prefs.wallPaperProvider)
                 if (prefs.dailyWallpaperUrl == wallpaperUrl)
                     true
                 else {

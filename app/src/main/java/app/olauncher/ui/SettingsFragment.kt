@@ -8,6 +8,7 @@ import android.os.Build
 import android.os.Bundle
 import android.os.Process
 import android.provider.Settings
+import android.util.Log
 import android.view.Gravity
 import android.view.LayoutInflater
 import android.view.View
@@ -39,6 +40,7 @@ import app.olauncher.helper.setPlainWallpaper
 import app.olauncher.helper.shareApp
 import app.olauncher.helper.showToast
 import app.olauncher.listener.DeviceAdmin
+import kotlin.math.log
 
 class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListener {
 
@@ -74,6 +76,7 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         populateLockSettings()
         populateWallpaperText()
         populateAppThemeText()
+        populateWallpaperProvider()
         populateTextSize()
         populateAlignment()
         populateStatusBar()
@@ -116,9 +119,11 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
             R.id.dateTimeOff -> toggleDateTime(Constants.DateTime.OFF)
             R.id.dateOnly -> toggleDateTime(Constants.DateTime.DATE_ONLY)
             R.id.appThemeText -> binding.appThemeSelectLayout.visibility = View.VISIBLE
+            R.id.wallpaperProviderText -> showWallpaperProviderLayOutVisibility()
             R.id.themeLight -> updateTheme(AppCompatDelegate.MODE_NIGHT_NO)
             R.id.themeDark -> updateTheme(AppCompatDelegate.MODE_NIGHT_YES)
             R.id.themeSystem -> updateTheme(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            R.id.wallpaperProviderAcceptButton -> updateWallPaperProvider()
             R.id.textSizeValue -> binding.textSizesLayout.visibility = View.VISIBLE
             R.id.actionAccessibility -> openAccessibilityService()
             R.id.closeAccessibility -> toggleAccessibilityVisibility(false)
@@ -219,6 +224,8 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         binding.notifications.setOnClickListener(this)
         binding.appThemeText.setOnClickListener(this)
         binding.themeLight.setOnClickListener(this)
+        binding.wallpaperProviderText?.setOnClickListener(this)
+        binding.wallpaperProviderAcceptButton?.setOnClickListener(this)
         binding.themeDark.setOnClickListener(this)
         binding.themeSystem.setOnClickListener(this)
         binding.textSizeValue.setOnClickListener(this)
@@ -254,6 +261,7 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         binding.dailyWallpaper.setOnLongClickListener(this)
         binding.alignment.setOnLongClickListener(this)
         binding.appThemeText.setOnLongClickListener(this)
+        binding.wallpaperProviderText?.setOnLongClickListener(this)
         binding.swipeLeftApp.setOnLongClickListener(this)
         binding.swipeRightApp.setOnLongClickListener(this)
         binding.toggleLock.setOnLongClickListener(this)
@@ -479,6 +487,22 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
         setAppTheme(appTheme)
     }
 
+    private fun updateWallPaperProvider(){
+        Log.d("WallpaperProvider", "Updating Wallpaper Provider");
+        prefs.wallPaperProvider = binding.wallpaperProviderTextInput?.editText?.text.toString();
+        viewModel.setWallpaperWorker();
+        showWallpaperToasts();
+
+        binding.wallpaperProviderLayout?.visibility = View.GONE;
+        binding.wallpaperProviderText?.visibility = View.VISIBLE;
+    }
+
+    private fun showWallpaperProviderLayOutVisibility(){
+        Log.d("WallpaperProvider", "Showing Wallpaper Provider");
+        binding.wallpaperProviderLayout?.visibility = View.VISIBLE;
+        binding.wallpaperProviderText?.visibility = View.GONE;
+    }
+
     private fun setAppTheme(theme: Int) {
         if (AppCompatDelegate.getDefaultNightMode() == theme) return
         if (prefs.dailyWallpaper) {
@@ -506,6 +530,9 @@ class SettingsFragment : Fragment(), View.OnClickListener, View.OnLongClickListe
             AppCompatDelegate.MODE_NIGHT_NO -> binding.appThemeText.text = getString(R.string.light)
             else -> binding.appThemeText.text = getString(R.string.system_default)
         }
+    }
+
+    private fun populateWallpaperProvider() {
     }
 
     private fun populateTextSize() {

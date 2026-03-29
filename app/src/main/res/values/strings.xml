@@ -155,4 +155,8 @@
     <string name="alignment_changed">Alignment changed ✅</string>
     <string name="home_screen">Home screen</string>
     <string name="hey">Hey</string>
+    <string name="wallpaper_provider" translatable="false">Wallpaper Provider</string>
+    <string name="wallpapersProvider_hint" translatable="false">Wall Papers URL</string>
+    <string name="default_text" translatable="false">Default</string>
+    <string name="TickSymbol" translatable="false">Accept</string>
 </resources>

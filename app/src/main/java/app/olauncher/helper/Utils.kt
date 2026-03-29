@@ -295,7 +295,7 @@ fun getScreenDimensions(context: Context): Pair<Int, Int> {
     return Pair(point.x, point.y)
 }
 
-suspend fun getTodaysWallpaper(wallType: String, firstOpenTime: Long): String {
+suspend fun getTodaysWallpaper(wallType: String, firstOpenTime: Long, wallPaperProviderURL: String): String {
     return withContext(Dispatchers.IO) {
         var wallpaperUrl: String
         try {
@@ -307,12 +307,13 @@ suspend fun getTodaysWallpaper(wallType: String, firstOpenTime: Long): String {
                 String.format("%s_%s", month, day)
             }
 
-            val url = URL(Constants.URL_WALLPAPERS)
+            val url = URL(if(wallPaperProviderURL.isBlank()) Constants.URL_WALLPAPERS else wallPaperProviderURL)
+            Log.d("WallpaperProvider", "URL1: $url")
             val connection: HttpURLConnection = url.openConnection() as HttpURLConnection
             connection.doInput = true
             connection.connect()
-
             val inputStream = connection.inputStream
+            Log.d("WallpaperProvider", "URL2: $url")
             val scanner = Scanner(inputStream)
             val stringBuffer = StringBuffer()
             while (scanner.hasNext()) {
@@ -320,12 +321,14 @@ suspend fun getTodaysWallpaper(wallType: String, firstOpenTime: Long): String {
             }
 
             val json = JSONObject(stringBuffer.toString())
+            Log.d("WallpaperProvider", "json: $json")
             val wallpapers = json.getString(key)
             val wallpapersJson = JSONObject(wallpapers)
             wallpaperUrl = wallpapersJson.getString(wallType)
             wallpaperUrl
 
         } catch (e: Exception) {
+            Log.e("WallpaperProvider", "Exception: $e")
             wallpaperUrl = getBackupWallpaper(wallType)
             wallpaperUrl
         }
